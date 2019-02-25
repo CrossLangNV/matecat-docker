@@ -17,8 +17,8 @@ COPY ./app_configs/config.ini /tmp/config.ini
 COPY ./app_configs/node_config.ini /tmp/node_config.ini
 COPY ./app_configs/Error_Mail_List.ini /tmp/Error_Mail_List.ini
 
-# If you want to enable the login ssystem add your oauth_config.ini taken from Google
-#COPY ./app_configs/oauth_config.ini /tmp/oauth_config.ini
+# Google OAuth
+COPY ./app_configs/oauth_config.ini /tmp/oauth_config.ini
 
 COPY ./app_configs/task_manager_config.ini /tmp/task_manager_config.ini
 
