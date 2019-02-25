@@ -32,10 +32,19 @@ services:
   mysql:
     build: ./MySQL/
     container_name: docker_mysql
+    # volumes:
+     # - ./MySQL/create_mysql_admin_user.sql:/docker-entrypoint-initdb.d/
+    #  - ./MySQL:/etc/mysql/conf.d
+    environment:
+     - MYSQL_ROOT_PASSWORD=root
+    #  - MYSQL_USER=admin
+    #  - MYSQL_PASSWORD=admin
     expose:
      - 3306
     networks:
        - matecat-network
+    # command:
+    #  - ./tmp/MySQL/run.sh
 
   mosesdecoder:
     build: ./Moses/
@@ -47,10 +56,10 @@ services:
   matecat:
     build: ./MateCatApache/
     container_name: docker_matecat
-    volumes:
-      - ~/matecat:/var/www/matecat:rw
+    # volumes:
+    #   - ../matecat:/var/www/matecat
     ports:
-      - 80
+      - 80:80
     networks:
        - matecat-network
     links:

@@ -54,7 +54,7 @@ fi
 echo "`cat ./inc/config.ini`"
 
 php -r "readfile('https://getcomposer.org/installer');" | php
-php ${MATECAT_HOME}/composer.phar install
+php ${MATECAT_HOME}/composer.phar --no-dev install
 
 pushd ./support_scripts/grunt
 
@@ -90,14 +90,14 @@ chown ${USER_OWNER} ./index.php
 
 ## Aache/PHPConfigurations
 # Prepare PHP INI
-sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" /etc/php5/apache2/php.ini
-sed -ri -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php5/apache2/php.ini
-sed -ri -e "s/^memory_limit.*/memory_limit = ${PHP_MAX_MEMORY}/" /etc/php5/apache2/php.ini
-sed -ri -e "s/^short_open_tag.*/short_open_tag = On/" /etc/php5/apache2/php.ini
+sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" /etc/php/7.2/apache2/php.ini
+sed -ri -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php/7.2/apache2/php.ini
+sed -ri -e "s/^memory_limit.*/memory_limit = ${PHP_MAX_MEMORY}/" /etc/php/7.2/apache2/php.ini
+sed -ri -e "s/^short_open_tag.*/short_open_tag = On/" /etc/php/7.2/apache2/php.ini
 
 # Configure XDebug ( if needed )
 if [[ -n "${XDEBUG_CONFIG}" ]]; then
-    XDEBUG='zend_extension='$(find /usr/lib/php5/ -name xdebug.so)'
+    XDEBUG='zend_extension='$(find /usr/lib/php/7.2/ -name xdebug.so)'
     xdebug.remote_enable=1
     xdebug.remote_autostart=1
     xdebug.remote_host="'${XDEBUG_CONFIG}'"
@@ -105,7 +105,7 @@ if [[ -n "${XDEBUG_CONFIG}" ]]; then
     xdebug.idekey="PHPSTORM"'
 
     printf "${XDEBUG}\n\n"
-    printf "${XDEBUG}" > /etc/php5/mods-available/xdebug.ini
+    printf "${XDEBUG}" > /etc/php/7.2/mods-available/xdebug.ini
 fi
 ## Aache/PHPConfigurations
 
