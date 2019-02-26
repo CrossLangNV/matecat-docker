@@ -32,7 +32,7 @@ fi
 MATECAT_VERSION=$(fgrep '=' ./inc/version.ini | awk '{print $3}')
 # always override
 cp /tmp/config.ini ./inc/
-[[ ! -f './nodejs/config.ini' ]] && cp /tmp/node_config.ini ./nodejs/config.ini
+cp /tmp/node_config.ini ./nodejs/config.ini
 [[ ! -f './inc/oauth_config.ini' ]] && cp /tmp/oauth_config.ini ./inc/
 [[ ! -f './inc/Error_Mail_List.ini' ]] &&  cp /tmp/Error_Mail_List.ini ./inc/
 [[ ! -f './inc/task_manager_config.ini' ]]  && cp /tmp/task_manager_config.ini ./inc/
