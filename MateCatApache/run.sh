@@ -118,6 +118,12 @@ popd
 
 echo "Starting Apache..."
 /etc/init.d/apache2 restart
+
+# Make sure everything in local_storage can be accessed by Apache
+chown -R ${USER_OWNER} ./local_storage
+chmod -R 777 ./local_storage
+
+apache2ctl restart
 echo "Apache Started"
 
 while true; do

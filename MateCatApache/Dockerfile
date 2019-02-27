@@ -13,6 +13,9 @@ ENV MATECAT_HOME "/var/www/matecat"
 # Copy matecat source code
 COPY matecat /var/www/matecat
 
+# Make sure there's a matecat/local_storage folder
+RUN mkdir -p /var/www/matecat/local_storage
+
 COPY ./app_configs/config.ini /tmp/config.ini
 COPY ./app_configs/node_config.ini /tmp/node_config.ini
 COPY ./app_configs/Error_Mail_List.ini /tmp/Error_Mail_List.ini
