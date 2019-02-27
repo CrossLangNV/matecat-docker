@@ -21,11 +21,12 @@ services:
        - matecat-network
 
   amq:
-    image: webcenter/activemq:latest
+    build: ./AMQ/
     expose:
       - 61613
       - 61616
-      - 8161
+    ports:
+      - 8161:8161
     networks:
        - matecat-network
        

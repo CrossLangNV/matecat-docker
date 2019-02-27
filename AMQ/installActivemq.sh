@@ -1,5 +1,5 @@
-
 #!/bin/bash
+
 echo "Configuring ActiveMq\n"
 
 if [[ ! -z "${ADM_ACCOUNT}" ]]; then

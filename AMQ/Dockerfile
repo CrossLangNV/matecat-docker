@@ -10,15 +10,17 @@ ENV DEBIAN_FRONTEND noninteractive
 #    add-apt-repository -y ppa:webupd8team/java && \
 #    apt-get update
 
-RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" >> /etc/apt/sources.list && \
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
-	apt-get update
+# RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" >> /etc/apt/sources.list && \
+# 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
+# 	apt-get update
 
 
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN apt-get install -y oracle-java8-installer && \
-    apt-get install -y oracle-java8-set-default
+# RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+# RUN apt-get install -y oracle-java8-installer && \
+#     apt-get install -y oracle-java8-set-default
 
+RUN apt-get update
+RUN apt-get install -y openjdk-7-jre
 
 RUN cd /tmp/
 RUN wget http://archive.apache.org/dist/activemq/5.13.2/apache-activemq-5.13.2-bin.tar.gz

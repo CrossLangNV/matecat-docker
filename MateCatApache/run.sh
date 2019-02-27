@@ -35,7 +35,9 @@ cp /tmp/config.ini ./inc/
 cp /tmp/node_config.ini ./nodejs/config.ini
 [[ ! -f './inc/oauth_config.ini' ]] && cp /tmp/oauth_config.ini ./inc/
 [[ ! -f './inc/Error_Mail_List.ini' ]] &&  cp /tmp/Error_Mail_List.ini ./inc/
-[[ ! -f './inc/task_manager_config.ini' ]]  && cp /tmp/task_manager_config.ini ./inc/
+#[[ ! -f './inc/task_manager_config.ini' ]]  && cp /tmp/task_manager_config.ini ./inc/
+# use the default executors config
+cp ./inc/task_manager_config.ini.sample ./inc/task_manager_config.ini
 
 sed -ri -e "s/X.X.X/${MATECAT_VERSION}/g" ./inc/config.ini
 sed -ri -e "s/_SMTP_HOST_/${SMTP_HOST}/g" ./inc/config.ini
