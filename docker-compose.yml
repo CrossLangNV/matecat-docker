@@ -60,3 +60,11 @@ services:
       - amq
       - filters
       - mosesdecoder
+      - parrot
+
+  parrot:
+    image: crosslang/parrot
+    ports:
+     - 8080:8080
+    networks:
+     - matecat-network
