@@ -25,11 +25,9 @@ COPY ./app_configs/oauth_config.ini /tmp/oauth_config.ini
 
 COPY ./app_configs/task_manager_config.ini /tmp/task_manager_config.ini
 
-# NodeJs
-COPY ./node-install.sh /tmp/node-install.sh
-RUN chmod +x /tmp/node-install.sh
-RUN /tmp/node-install.sh
-RUN rm /tmp/node-install.sh
+# Node.js v8.x
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+RUN apt-get install -y nodejs
 
 # Monit
 COPY monitrc /etc/monit/monitrc
@@ -44,7 +42,7 @@ RUN useradd -ms /bin/bash -g www-data www-data
 
 ## ENABLE Deployment utils ( apache follows symbolic links to DocumentRoot )
 RUN apt-get update
-RUN apt-get install -y apache2-prefork-dev php5-dev php5-mcrypt
+RUN apt-get install -y apache2 php5-dev php5-mcrypt
 RUN git clone https://github.com/etsy/mod_realdoc.git
 WORKDIR "/mod_realdoc"
 RUN apxs2 -i -a -c mod_realdoc.c
@@ -53,7 +51,7 @@ RUN rm -rf ./mod_realdoc
 
 ## Enable MateCat site
 COPY 000-matecat.conf /etc/apache2/sites-enabled/000-matecat.conf
-RUN a2enmod rewrite filter deflate headers expires proxy_http
+RUN a2enmod rewrite filter deflate headers expires proxy_http.load
 RUN php5enmod mcrypt
 
 # Start app_configslication
