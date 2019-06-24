@@ -3,6 +3,6 @@
 USE `matecat`;
 
 UPDATE engines 
-SET name = 'parrot',
-    base_url = 'http://parrot:8080'
+SET name = 'mouse',
+    base_url = 'http://mouse:8080'
 WHERE id = 1;

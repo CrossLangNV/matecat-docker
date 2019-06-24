@@ -60,11 +60,19 @@ services:
       - amq
       - filters
       - mosesdecoder
+      - mouse
       - parrot
+
+  mouse:
+    image: crosslang/mouse
+    ports:
+     - 8080:8080
+    networks:
+     - matecat-network
 
   parrot:
     image: crosslang/parrot
     ports:
-     - 8080:8080
+     - 8090:8080
     networks:
      - matecat-network
