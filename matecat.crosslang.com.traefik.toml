@@ -1,0 +1,65 @@
+# Important:
+# - Keep the basic authentication credentials up to date!
+# - Remove the basic authentication 'entryPoints.https.auth' for production!
+# - Keep the domain in the '[docker]' section and email address in the '[acme]' section up to date!
+
+#Traefik Global Configuration
+
+debug = false
+checkNewVersion = true
+logLevel = "DEBUG"
+
+#Define the EntryPoint for HTTP and HTTPS
+defaultEntryPoints = ["https","http"]
+
+#Define the HTTP port 80 and
+#HTTPS port 443 EntryPoint
+#Enable automatically redirect HTTP to HTTPS
+[entryPoints]
+[entryPoints.http]
+address = ":80"
+[entryPoints.http.redirect]
+entryPoint = "https"
+[entryPoints.https]
+address = ":443"
+[entryPoints.https.tls]
+[entryPoints.https.auth]
+[entryPoints.https.auth.basic]
+    users = [
+        # "user:pw"
+    ]
+
+#Enable Traefik Dashboard on port 8080
+#with basic authentication method
+#hakase and password
+[entryPoints.dash]
+address=":8080"
+[entryPoints.dash.auth]
+[entryPoints.dash.auth.basic]
+    users = [
+        # "user:pw"
+    ]
+
+[api]
+entrypoint="dash"
+dashboard = true
+
+#Enable retry sending a request if the network error
+[retry]
+
+#Define Docker Backend Configuration
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "matecat.crosslang.com"
+watch = true
+exposedbydefault = false
+
+#Letsencrypt Registration
+#Define the Letsencrypt ACME HTTP challenge
+[acme]
+email = "it@crosslang.com"
+storage = "acme.json"
+entryPoint = "https"
+OnHostRule = true
+  [acme.httpChallenge]
+  entryPoint = "http"

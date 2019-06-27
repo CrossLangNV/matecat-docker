@@ -3,11 +3,36 @@ version: '2'
 networks:
   matecat-network:
     driver: bridge
+    external: false
 
 services:
+
+  traefik:
+    image: traefik:latest
+    command: --docker
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=dashboard"
+      - "traefik.frontend.rule=Host:${HOSTNAME_TRAEFIK}"
+      - "traefik.port=8080"
+    networks:
+      - matecat-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./${HOSTNAME_MATECAT}.traefik.toml:/traefik.toml
+      - ./traefik-acme.json:/acme.json
+    depends_on:
+      - matecat
+    restart: always
+
   filters:
     build: ./MateCatFilters/
     container_name: docker_matecat_filter
+    labels:
+      - "traefik.enable=false"
     expose:
       - 8732
     networks:
@@ -15,6 +40,8 @@ services:
 
   redis:
     image: redis
+    labels:
+      - "traefik.enable=false"
     expose:
       - 6379
     networks:
@@ -22,17 +49,19 @@ services:
 
   amq:
     build: ./AMQ/
+    labels:
+      - "traefik.enable=false"
     expose:
       - 61613
       - 61616
-    ports:
-      - 8161:8161
     networks:
        - matecat-network
-       
+
   mysql:
     build: ./MySQL/
     container_name: docker_mysql
+    labels:
+      - "traefik.enable=false"
     environment:
      - MYSQL_ROOT_PASSWORD=root
     expose:
@@ -42,6 +71,8 @@ services:
 
   mosesdecoder:
     build: ./Moses/
+    labels:
+      - "traefik.enable=false"
     expose:
      - 8000
     networks:
@@ -50,8 +81,12 @@ services:
   matecat:
     build: ./MateCatApache/
     container_name: docker_matecat
-    ports:
-      - 80:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=matecat"
+      - "traefik.frontend.rule=Host:${HOSTNAME_MATECAT}"
+      - "traefik.docker.network=matecat-network"
+      - "traefik.port=80"
     networks:
        - matecat-network
     links:
@@ -65,14 +100,22 @@ services:
 
   mouse:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/mouse
-    ports:
-     - 8080:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mouse"
+      - "traefik.frontend.rule=Host:${HOSTNAME_MOUSE}"
+      - "traefik.docker.network=matecat-network"
+      - "traefik.port=8080"
     networks:
      - matecat-network
 
   parrot:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/parrot
-    ports:
-     - 8090:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=parrot"
+      - "traefik.frontend.rule=Host:${HOSTNAME_PARROT}"
+      - "traefik.docker.network=matecat-network"
+      - "traefik.port=8080"
     networks:
      - matecat-network
