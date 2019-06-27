@@ -23,11 +23,6 @@ entryPoint = "https"
 [entryPoints.https]
 address = ":443"
 [entryPoints.https.tls]
-[entryPoints.https.auth]
-[entryPoints.https.auth.basic]
-    users = [
-        # "user:pw"
-    ]
 
 #Enable Traefik Dashboard on port 8080
 #with basic authentication method

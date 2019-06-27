@@ -87,6 +87,7 @@ services:
       - "traefik.frontend.rule=Host:${HOSTNAME_MATECAT}"
       - "traefik.docker.network=matecat-network"
       - "traefik.port=80"
+      - "traefik.frontend.auth.basic=${BASIC_AUTH}"
     networks:
        - matecat-network
     links:
@@ -106,6 +107,7 @@ services:
       - "traefik.frontend.rule=Host:${HOSTNAME_MOUSE}"
       - "traefik.docker.network=matecat-network"
       - "traefik.port=8080"
+      - "traefik.frontend.auth.basic=${BASIC_AUTH}"
     networks:
      - matecat-network
 
@@ -117,5 +119,6 @@ services:
       - "traefik.frontend.rule=Host:${HOSTNAME_PARROT}"
       - "traefik.docker.network=matecat-network"
       - "traefik.port=8080"
+      - "traefik.frontend.headers.customresponseheaders.Access-Control-Allow-Origin = '*'"
     networks:
      - matecat-network
