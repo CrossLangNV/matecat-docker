@@ -67,6 +67,10 @@ services:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/mouse
     ports:
      - 8080:8080
+    environment:
+     - MOUSE_PROTOCOL=http
+     - MOUSE_HOSTNAME=localhost
+     - MOUSE_PORT=8080
     networks:
      - matecat-network
 
@@ -76,3 +80,9 @@ services:
      - 8090:8080
     networks:
      - matecat-network
+
+  # tcpdump:
+  #   image: kaazing/tcpdump
+  #   network_mode: "host"
+  #   volumes:
+  #     - ./tcpdump:/tcpdump
