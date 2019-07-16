@@ -108,6 +108,10 @@ services:
       - "traefik.docker.network=matecat-network"
       - "traefik.port=8080"
       - "traefik.frontend.auth.basic=${BASIC_AUTH}"
+    environment:
+     - MOUSE_PROTOCOL=https
+     - MOUSE_HOSTNAME=${HOSTNAME_MOUSE}
+     - MOUSE_PORT=443
     networks:
      - matecat-network
 
@@ -122,3 +126,9 @@ services:
       - "traefik.frontend.headers.customresponseheaders.Access-Control-Allow-Origin = '*'"
     networks:
      - matecat-network
+
+  # tcpdump:
+  #   image: kaazing/tcpdump
+  #   network_mode: "host"
+  #   volumes:
+  #     - ./tcpdump:/tcpdump
