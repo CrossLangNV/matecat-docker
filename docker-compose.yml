@@ -60,11 +60,11 @@ services:
       - amq
       - filters
       - mosesdecoder
-      - mouse
+      - gorilla
       - parrot
 
   mouse:
-    image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/mouse
+    image: crosslang/mouse
     ports:
      - 8080:8080
     environment:
@@ -73,6 +73,19 @@ services:
      - MOUSE_PORT=8080
     networks:
      - matecat-network
+
+  gorilla:
+    image: crosslang/gorilla
+    ports:
+      - 8081:8081
+    environment:
+      - SERVER_PORT=8081
+      - SERVER_MOUSEURL=http://mouse:8080
+      - ZUUL_ROUTES_MOUSE_URL=http://mouse:8080
+    networks:
+      - matecat-network
+    links:
+      - mouse
 
   parrot:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/parrot
