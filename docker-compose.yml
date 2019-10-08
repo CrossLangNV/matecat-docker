@@ -64,7 +64,7 @@ services:
       - parrot
 
   mouse:
-    image: crosslang/mouse
+    image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/mouse
     ports:
      - 8080:8080
     environment:
@@ -75,7 +75,7 @@ services:
      - matecat-network
 
   gorilla:
-    image: crosslang/gorilla
+    image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/gorilla
     ports:
       - 8081:8081
     environment:
