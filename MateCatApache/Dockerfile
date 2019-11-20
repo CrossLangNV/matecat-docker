@@ -19,6 +19,7 @@ RUN mkdir -p /var/www/matecat/local_storage
 COPY ./app_configs/config.ini /tmp/config.ini
 COPY ./app_configs/node_config.ini /tmp/node_config.ini
 COPY ./app_configs/Error_Mail_List.ini /tmp/Error_Mail_List.ini
+COPY ./app_configs/build.xml /tmp/build.xml
 
 # Google OAuth
 COPY ./app_configs/oauth_config.ini /tmp/oauth_config.ini

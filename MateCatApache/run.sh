@@ -32,6 +32,13 @@ fi
 MATECAT_VERSION=$(fgrep '=' ./inc/version.ini | awk '{print $3}')
 # always override
 cp /tmp/config.ini ./inc/
+
+# for testing purposes
+cp /tmp/config.ini ./inc/config.test.ini
+cp /tmp/config.ini ./inc/config.development.ini
+cp /tmp/build.xml ./build.xml
+mkdir ./html
+
 cp /tmp/node_config.ini ./nodejs/config.ini
 [[ ! -f './inc/oauth_config.ini' ]] && cp /tmp/oauth_config.ini ./inc/
 [[ ! -f './inc/Error_Mail_List.ini' ]] &&  cp /tmp/Error_Mail_List.ini ./inc/
@@ -58,7 +65,11 @@ fi
 echo "`cat ./inc/config.ini`"
 
 php -r "readfile('https://getcomposer.org/installer');" | php
-php ${MATECAT_HOME}/composer.phar --no-dev install
+php ${MATECAT_HOME}/composer.phar install
+
+# test config
+${MATECAT_HOME}/composer.phar global require phing/phing
+echo "PATH=/root/.composer/vendor/bin:$PATH" >> /root/.bashrc
 
 pushd ./support_scripts/grunt
 
