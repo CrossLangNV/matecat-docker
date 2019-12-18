@@ -61,7 +61,6 @@ services:
       - filters
       - mosesdecoder
       - gorilla
-      - parrot
 
   mouse:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/mouse
@@ -74,25 +73,32 @@ services:
     networks:
      - matecat-network
 
+  ape:
+    image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/copycat-ape-rest
+    ports:
+      - 5000:5000
+    networks:
+     - matecat-network
+
   gorilla:
     image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/gorilla
     ports:
       - 8081:8081
     environment:
       - SERVER_PORT=8081
-      - SERVER_MOUSEURL=http://mouse:8080
+      - TM_URL=http://mouse:8080
       - ZUUL_ROUTES_MOUSE_URL=http://mouse:8080
+      - MT_BASEURL=https://portal.mtapi.apequest-demo.crosslang.com
+      - MT_TRANSLATIONURL=/translations/translations/blocking
+      - APE_BASEURL=http://ape:5000
+      - QE_CALLBACKURL=http://19a486c9.ngrok.io/qe/callback
+      - PE_CALLBACKURL=http://19a486c9.ngrok.io/pe/callback
+      - MATECAT_BASEURL=http://matecat
     networks:
       - matecat-network
     links:
       - mouse
-
-  parrot:
-    image: 107863181523.dkr.ecr.eu-west-1.amazonaws.com/parrot
-    ports:
-     - 8090:8080
-    networks:
-     - matecat-network
+      - ape
 
   # tcpdump:
   #   image: kaazing/tcpdump
