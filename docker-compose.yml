@@ -40,13 +40,6 @@ services:
     networks:
        - matecat-network
 
-  mosesdecoder:
-    build: ./Moses/
-    expose:
-     - 8000
-    networks:
-     - matecat-network
-
   matecat:
     build: ./MateCatApache/
     container_name: docker_matecat
@@ -59,7 +52,6 @@ services:
       - redis
       - amq
       - filters
-      - mosesdecoder
       - mouse
       - parrot
 
