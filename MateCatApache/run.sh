@@ -30,7 +30,8 @@ fi
 
 # MateCat
 MATECAT_VERSION=$(fgrep '=' ./inc/version.ini | awk '{print $3}')
-# always override
+# always override, resolve env vars in config.ini
+envsubst < /tmp/config.ini | sponge /tmp/config.ini
 cp /tmp/config.ini ./inc/
 cp /tmp/node_config.ini ./nodejs/config.ini
 [[ ! -f './inc/oauth_config.ini' ]] && cp /tmp/oauth_config.ini ./inc/

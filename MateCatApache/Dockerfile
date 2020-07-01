@@ -32,6 +32,9 @@ RUN apt-get install -y nodejs
 # Monit
 COPY monitrc /etc/monit/monitrc
 
+# Moreutils: for sponge
+RUN apt-get install -y moreutils
+
 # Apache
 RUN mkdir /var/log/apache2/matecat/
 RUN rm -rf /etc/apache2/sites-available/default
