@@ -1,35 +1,34 @@
-FROM ostico/trusty-base:latest
+FROM ubuntu:bionic
+
+RUN apt-get update
+
+RUN apt-get -y --fix-missing install ssh-client vim locate iputils-ping monit git curl wget net-tools tree software-properties-common locales \
+    psmisc screen dstat \
+    traceroute whois libaio1 perl perl-base perl-modules
+
+RUN apt-get -y full-upgrade
+
+RUN locale-gen en_US.UTF-8
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 ENV JAVA_OPTS '-Xmx256M'
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -snvf /bin/true /sbin/initctl
 ENV DEBIAN_FRONTEND noninteractive
 
-# Oracle java is bulkier but avoids boot2docker/aufs docker issue 18180
-# RUN apt-get install -y software-properties-common python-software-properties && \
-#    add-apt-repository -y ppa:webupd8team/java && \
-#    apt-get update
-
-# RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" >> /etc/apt/sources.list && \
-# 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
-# 	apt-get update
-
-
-# RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-# RUN apt-get install -y oracle-java8-installer && \
-#     apt-get install -y oracle-java8-set-default
-
-RUN apt-get update
-RUN apt-get install -y openjdk-7-jre
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:openjdk-r/ppa && \
+    apt-get update
+RUN apt-get install -y openjdk-8-jre
 
 RUN cd /tmp/
-RUN wget http://archive.apache.org/dist/activemq/5.13.2/apache-activemq-5.13.2-bin.tar.gz
-RUN tar xzf apache-activemq-5.13.2-bin.tar.gz && rm apache-activemq-5.13.2-bin.tar.gz
-RUN mv apache-activemq-5.13.2 /opt
-RUN ln -sf /opt/apache-activemq-5.13.2/ /opt/activemq
+RUN wget http://archive.apache.org/dist/activemq/5.15.10/apache-activemq-5.15.10-bin.tar.gz
+RUN tar xzf apache-activemq-5.15.10-bin.tar.gz && rm apache-activemq-5.15.10-bin.tar.gz
+RUN mv apache-activemq-5.15.10 /opt
+RUN ln -sf /opt/apache-activemq-5.15.10/ /opt/activemq
 RUN adduser -system activemq
 RUN sed -i "s#activemq:/bin/false#activemq:/bin/bash#g" /etc/passwd
-RUN chown -R activemq: /opt/apache-activemq-5.13.2/
+RUN chown -R activemq: /opt/apache-activemq-5.15.10/
 RUN ln -sf /opt/activemq/bin/activemq /etc/init.d/
 
 

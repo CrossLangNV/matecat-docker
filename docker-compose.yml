@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 networks:
   matecat-network:
@@ -7,53 +7,57 @@ networks:
 services:
   filters:
     build: ./MateCatFilters/
-    container_name: docker_matecat_filter
-    expose:
-      - 8732
+    ports:
+      - 8732:8732
     networks:
-       - matecat-network
+      - matecat-network
 
   redis:
     image: redis
-    expose:
-      - 6379
+    ports:
+      - 6379:6379
     networks:
-       - matecat-network
+      - matecat-network
 
   amq:
     build: ./AMQ/
-    expose:
-      - 61613
-      - 61616
     ports:
+      - 61613:61613
       - 8161:8161
     networks:
-       - matecat-network
+      - matecat-network
        
   mysql:
     build: ./MySQL/
-    container_name: docker_mysql
     environment:
-     - MYSQL_ROOT_PASSWORD=root
-    expose:
-     - 3306
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 3306:3306
     networks:
-       - matecat-network
+      - matecat-network
 
   matecat:
     build: ./MateCatApache/
-    container_name: docker_matecat
     ports:
       - 80:80
+    environment: 
+      - MATECAT_HOST=http://localhost
+      - MATECAT_COOKIE_DOMAIN=localhost
+      - SMTP_USERNAME=info@example.com
+      - SMTP_SENDER=info@example.com
+      - SMTP_PORT=587
+      - SMTP_PASSWORD=example
+      - SMTP_HOST=some.smtp.host.com
+      - TM_NAME=Mouse
+      - TM_ENDPOINT=http://mouse:8080
     networks:
-       - matecat-network
+      - matecat-network
     links:
       - mysql
       - redis
       - amq
       - filters
       - mouse
-      - parrot
 
   mouse:
     image: docker.crosslang.com/mouse
@@ -65,16 +69,3 @@ services:
      - MOUSE_PORT=8080
     networks:
      - matecat-network
-
-  parrot:
-    image: docker.crosslang.com/parrot
-    ports:
-     - 8090:8080
-    networks:
-     - matecat-network
-
-  # tcpdump:
-  #   image: kaazing/tcpdump
-  #   network_mode: "host"
-  #   volumes:
-  #     - ./tcpdump:/tcpdump

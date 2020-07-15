@@ -4,9 +4,9 @@
 echo "Need Root for installing NodeJS"
 sh -c 'echo "Got Root!"' 
 
-echo "Get Latest Version Number..."
+echo "Get Latest v10 Number..."
 {
-wget --output-document=node-updater.html https://nodejs.org/dist/latest/
+wget --output-document=node-updater.html https://nodejs.org/dist/latest-v10.x/
 
 ARCH=$(uname -m)
 
@@ -28,10 +28,10 @@ echo "Done"
 
 DIR=$( cd "$( dirname $0 )" && pwd )
 
-echo "Downloading latest stable Version $VER..."
+echo "Downloading latest v10 stable Version $VER..."
 {
-echo "wget https://nodejs.org/dist/latest/$VER -O $DIR/$VER"
-wget https://nodejs.org/dist/latest/$VER -O $DIR/$VER
+echo "wget https://nodejs.org/dist/latest-v10.x/$VER -O $DIR/$VER"
+wget https://nodejs.org/dist/latest-v10.x/$VER -O $DIR/$VER
 } # &> /dev/null
 
 echo "Done"

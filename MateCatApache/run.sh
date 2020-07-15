@@ -24,6 +24,9 @@ if [[ -z "${MATECAT_EXISTS}" ]]; then
     # MySql MateCat
     # Creating schema and fill some data
     echo "Executing: /usr/bin/mysql -uadmin -padmin -h mysql < ./lib/Model/matecat.sql"
+    # update base sql script
+    sed -i "s/TM_NAME/$TM_NAME/" ./lib/Model/matecat.sql
+    sed -i "s|TM_ENDPOINT|$TM_ENDPOINT|" ./lib/Model/matecat.sql
     /usr/bin/mysql -uadmin -padmin -h mysql < ./lib/Model/matecat.sql
 fi
 
@@ -58,8 +61,8 @@ fi
 # debug, configuration
 echo "`cat ./inc/config.ini`"
 
-php -r "readfile('https://getcomposer.org/installer');" | php
-php ${MATECAT_HOME}/composer.phar --no-dev install
+php5.6 -r "readfile('https://getcomposer.org/installer');" | php5.6
+php5.6 ${MATECAT_HOME}/composer.phar --no-dev install
 
 pushd ./support_scripts/grunt
 
@@ -102,7 +105,7 @@ sed -ri -e "s/^short_open_tag.*/short_open_tag = On/" /etc/php/5.6/apache2/php.i
 
 # Configure XDebug ( if needed )
 if [[ -n "${XDEBUG_CONFIG}" ]]; then
-    XDEBUG='zend_extension='$(find /usr/lib/php5/ -name xdebug.so)'
+    XDEBUG='zend_extension='$(find /usr/lib/php5.6/ -name xdebug.so)'
     xdebug.remote_enable=1
     xdebug.remote_autostart=1
     xdebug.remote_host="'${XDEBUG_CONFIG}'"
@@ -110,7 +113,7 @@ if [[ -n "${XDEBUG_CONFIG}" ]]; then
     xdebug.idekey="PHPSTORM"'
 
     printf "${XDEBUG}\n\n"
-    printf "${XDEBUG}" > /etc/php5/mods-available/xdebug.ini
+    printf "${XDEBUG}" > /etc/php5.6/mods-available/xdebug.ini
 fi
 ## Aache/PHPConfigurations
 
