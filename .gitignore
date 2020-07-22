@@ -1,6 +1,7 @@
 MateCatApache/matecat
 **/oauth_config.ini
 ngramDB/
+elasticsearch_data/
 presentation/
 MateCatWinConverter/
 tcpdump/

@@ -48,24 +48,34 @@ services:
       - SMTP_PORT=587
       - SMTP_PASSWORD=example
       - SMTP_HOST=some.smtp.host.com
-      - TM_NAME=Mouse
-      - TM_ENDPOINT=http://mouse:8080
+      - TM_NAME=NEC-TM
+      - TM_ENDPOINT=http://nectm-connector:5000
     networks:
       - matecat-network
-    links:
+    depends_on:
       - mysql
       - redis
       - amq
       - filters
-      - mouse
+      - nectm-connector
 
-  mouse:
-    image: docker.crosslang.com/mouse
+  nectm-connector:
+    image: docker.crosslang.com/nectm-connector
+    command: flask run
     ports:
-     - 8080:8080
-    environment:
-     - MOUSE_PROTOCOL=http
-     - MOUSE_HOSTNAME=localhost
-     - MOUSE_PORT=8080
+      - "5000:5000"
+    depends_on: 
+      - nectm
     networks:
-     - matecat-network
+      - matecat-network
+    
+  nectm:
+    image: nectm/activatm
+    ports:
+      - "27979:7979"
+      - "27878:7878"
+      - "19200:9200"
+    volumes: 
+      - ./elasticsearch_data:/elasticsearch_data
+    networks:
+      - matecat-network
