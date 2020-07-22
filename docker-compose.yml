@@ -52,7 +52,7 @@ services:
       - TM_ENDPOINT=http://mouse:8080
     networks:
       - matecat-network
-    links:
+    depends_on:
       - mysql
       - redis
       - amq
