@@ -23,7 +23,7 @@ git clone https://github.com/matecat/MateCat.git ~/matecat
 
 3. Copy/move Matecat source folder to `MateCatApache/matecat`
 
-4. Provide a valid `oauth.config.ini` file in `MateCatApache/app_configs` for Google OAuth
+4. Provide a valid `oauth_config.ini` file in `MateCatApache/app_configs` for Google OAuth
 
 # Start Docker
 
