@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<srx version="2.0" xmlns="http://www.lisa.org/srx20" xmlns:okpsrx="http://okapi.sf.net/srx-extensions">
+  <header cascade="yes" segmentsubflows="yes">
+    <formathandle include="no" type="start"/>
+    <formathandle include="yes" type="end"/>
+    <formathandle include="no" type="isolated"/>
+    <!--SRX trims are disabled because it's better for us to handle it in MateCAT.
+    With SRX trims enabled, often spaces and tags at the end of the trans-unit will
+    form a whole <mrk>, that MateCAT shows as an empty segment. Avoiding trimming
+    here no "empty" segments are produced, and spaces are still trimmed by MateCAT
+    with the strip_external function.-->
+    <okpsrx:options oneSegmentIncludesAll="no" trimLeadingWhitespaces="no" trimTrailingWhitespaces="no" useJavaRegex="yes"/>
+    <okpsrx:sample language="en" useMappedRules="yes">Abbreviation: Hello dott. Jones!
+
+Single letter abbreviation: Go to p. 38. Test, e.g. Uppercase.
+
+Url: http://www.web.com/web.web?v=v&amp;v=v
+
+List:
+1. One.
+II. Two.
+c. Three.</okpsrx:sample>
+    <okpsrx:rangeRule/>
+  </header>
+  <body>
+    <languagerules>
+      <languagerule languagerulename="Global">
+        <!--Abbreviations followed by an uppercase letter.
+        <rule break="no"><beforebreak>(?i)\b(Hon|Dr|st|Hr|mm|mmes?|mssrs?|sign|sig|dott|Mr|Ms|Mrs|Sr|Sra|Srto|Srta|St|Gen|Col|Maj|Gov|Brig|Sgt|Capt|Ch|Cmnd|Lt|Sen|Rev|Esq|Rep|Revd|Pr|Br|Pres|prof|JS|cf|ph\.####d|cit|ex)\.\uE105\s*</beforebreak>
+        <afterbreak></afterbreak></rule-->
+        <!--Don't break on max/min abbr. and international measure unit: cm. 35-->
+        <rule break="no">
+          <beforebreak>(?i)\b(mm|cm|dm|m|km|mg|cg|dg|g|gr|kg|max|min)\.\uE105?\s*</beforebreak>
+          <afterbreak>\d</afterbreak>
+        </rule>
+        <!--Don't break on names abbreviations: J. K. Simmons is a great actor!-->
+        <rule break="no">
+          <beforebreak>\b[A-Z]\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Don't break on sentences like: Only .004% resulted in a damage.-->
+        <rule break="no">
+          <beforebreak>\s\.</beforebreak>
+          <afterbreak>\d+%</afterbreak>
+        </rule>
+        <!--Handle gracefully lists, avoiding breaking on starting numbers, letters and roman numbers.
+        For example:
+          1. Item with number identifier.
+          a. Item with letter identifier.
+          I. Item with roman number identifier.
+          1.1. All the previous identifiers work also for nested items like this.
+        I also considered items like these:
+          a) Item with identifier ending with parenthesis.
+          (a) Item with identifier wrapped in parenthesis.
+        But in these cases, ICU is not splitting, so we can exclude these cases from this rule.
+        With this rule, we are supporting all the main lists identifiers.-->
+        <rule break="no">
+          <beforebreak>(?im)^(([0-9]+|[ivx]+|\p{L})\.\uE105?\s*)+</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Don't break inside HTML tags.
+        Fails only with a ">" inside an attribute: <a title="a>b" href="/?a=1">-->
+        <rule break="no">
+          <beforebreak>(?i)&lt;[a-z]+ [^&gt;]+\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--ICU splits at the question mark inside urls: this rule avoids it.
+        Matches everything like "text.text/text?"-->
+        <rule break="no">
+          <beforebreak>\S+\.\S+/\S*\?\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--ICU splits this: "Sentence that ends with footnote reference. [1]"-->
+        <rule break="no">
+          <beforebreak>(\p{Ps}|\p{Pi})\uE105\s*</beforebreak>
+          <afterbreak>\d+(\p{Pe}|\p{Pf})</afterbreak>
+        </rule>
+        <!--ICU splits this: "Normal sentence (question in parenthesis?) lowercase end."-->
+        <rule break="no">
+          <beforebreak>[?!]\)\uE105\s*</beforebreak>
+          <afterbreak>\p{L}</afterbreak>
+        </rule>
+        <!--The most important rule: split on ICU hints-->
+        <rule break="yes">
+          <beforebreak>\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Split after footnote reference (see footnote exception above)-->
+        <rule break="yes">
+          <beforebreak>(\p{Ps}|\p{Pi})\uE105\s*\d+(\p{Pe}|\p{Pf})</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--ICU doesn't split sentences like "2 bananas. 3 tomatoes." Pay attention: this introduces a new major break not caused by the \uE105 char, must take into account in abbreviations exception, especially in abbreviations before numbers and single letter abbreviations-->
+        <rule break="yes">
+          <beforebreak>\D\.\s*</beforebreak>
+          <afterbreak>\d</afterbreak>
+        </rule>
+        <!--ICU doesn't split lists like "- First Item. - Second item."-->
+        <rule break="yes">
+          <beforebreak>[\.!?]\s*</beforebreak>
+          <afterbreak>-</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="Telephone numbers exceptions">
+        <!--Don't break in cases like: tel. +39 34578464 or fax. (15) 545468754-->
+        <rule break="no">
+          <beforebreak>(?i)\b(tel|fax|cell?)\.\uE105?\s*</beforebreak>
+          <afterbreak>[\d+\()]</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="Single letter abbreviations exception">
+        <!--Treat as abbreviation every lower-case letter followed by a period,
+        so cases like "e.g." or "i.e." are automatically handled.-->
+        <rule break="no">
+          <beforebreak>\b\p{L}\.\uE105?\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="English (EN) exceptions">
+        <!--Abbreviations-->
+        <rule break="no">
+          <beforebreak>(?i)\b(Adj|Adm|Adv|Asst|Bart|Bldg|Brig|Bros|Capt|Cmdr|Col|Comdr|Con|Corp|Cpl|DR|Dr|Drs|Ens|Fig|Figs|Gen|Gov|Hon|Hr|Hosp|Insp|Lt|MM|MR|MRS|MS|Maj|Messrs|Mlle|Mme|Mr|Mrs|Ms|Msgr|Op|Ord|Pfc|Ph|Prof|Pvt|Rep|Reps|Res|Rev|Rt|Sen|Sens|Sfc|Sgt|Sr|St|Supt|Surg|vs|rev)\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Abbreviations followed by numbers-->
+        <rule break="no">
+          <beforebreak>(?i)\b(No|Nos|Nr|Art|pp|pag|vol|fig|chap|approx)\.\uE105?\s*</beforebreak>
+          <afterbreak>\d</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="Italian (IT) exceptions">
+        <!--Abbreviations-->
+        <rule break="no">
+          <beforebreak>(?i)\b(Adj|Adm|Adv|Amn|Arch|Asst|Avv|Bart|Bcc|Bldg|Brig|Bros|Capt|Cc|Cmdr|Co|Col|Comdr|Con|Corp|Cpl|DR|Dott|Dr|Drs|Egr|Ens|Fig|Gen|Geom|Gov|Hon|Hosp|Hr|Id|Ing|Insp|Lt|MM|MR|MRS|MS|Maj|Messrs|Mlle|Mme|Mo|Mons|Mr|Mrs|Ms|Msgr|Op|Ord|Pfc|Ph|Prof|Pvt|RP|RSVP|Rag|Rep|Reps|Res|Rev|Rif|Rt|Sen|Sens|Sfc|Sgt|Sig|Sigg|Soc|Spett|Sr|St|Supt|Surg|acc|all|banc|corr|dott|ecc|es|fatt|gg|int|lett|ogg|on|post|pp|racc|ric|seg|sgg|ss|tel|vs|rev|lgs)\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Compound abbreviations need another rule to avoid breaking inside them-->
+        <rule break="no">
+          <beforebreak>(?i)\bp\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)es\.</afterbreak>
+        </rule>
+        <!--Abbreviations followed by numbers-->
+        <rule break="no">
+          <beforebreak>(?i)\b(No|Nos|Art|Nr|pp|pag|vol|fig|cap|art|mq)\.\uE105?\s*</beforebreak>
+          <afterbreak>\d</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="French (FR) exceptions">
+        <!--Abbreviations-->
+        <rule break="no">
+          <beforebreak>(?i)\b(art|ann|apr|av|auj|lib|boul|ca|cf|chap|contr|dir|éd|env|al|etc|ex|fasc|fém|fig|fr|hab|ibid|id|inf|masc|MM|ms|n/réf|pl|pp|SS|sec|sect|sing|sq|sqq|suiv|sup|suppl|tél|vb|vol|vs)\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Abbreviation: ch.-l -->
+        <rule break="no">
+          <beforebreak>(?i)\bch\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)-l</afterbreak>
+        </rule>
+        <!--Abbreviation: loc.cit-->
+        <rule break="no">
+          <beforebreak>(?i)\bloc\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)cit</afterbreak>
+        </rule>
+        <!--Abbreviation: p.ex-->
+        <rule break="no">
+          <beforebreak>(?i)\bp\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)ex</afterbreak>
+        </rule>
+        <!--Abbreviation: L.D-->
+        <rule break="no">
+          <beforebreak>(?i)\bL\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)D</afterbreak>
+        </rule>
+        <!--Abbreviation: R.-V-->
+        <rule break="no">
+          <beforebreak>(?i)\bR\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)-V</afterbreak>
+        </rule>
+        <!--Abbreviation: NN.SS-->
+        <rule break="no">
+          <beforebreak>(?i)\bNN\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)SS</afterbreak>
+        </rule>
+        <!--Abbreviation: LL.AA, LL.EE, LL.MM-->
+        <rule break="no">
+          <beforebreak>(?i)\bLL\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)AA|EE|MM</afterbreak>
+        </rule>
+        <!--Abbreviation: LL.AA.II, LL.AA.RR, LL.AA.SS-->
+        <rule break="no">
+          <beforebreak>(?i)\bLL\.\uE105?\s*\bAA\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)II|RR|SS</afterbreak>
+        </rule>
+        <!--Abbreviation: LL.MM.II.RR (sadly, two rules are needed for this)-->
+        <rule break="no">
+          <beforebreak>(?i)\bLL\.\uE105?\s*MM\.\uE105?\s*</beforebreak>
+          <afterbreak>(?i)II</afterbreak>
+        </rule>
+        <rule break="no">
+          <beforebreak>(?i)\bLL\.\uE105?\s*MM\.\uE105?\s*II\.\uE105?\s*</beforebreak>
+          <afterbreak>(?i)RR</afterbreak>
+        </rule>
+        <!--Abbreviation: c.-à-d -->
+        <rule break="no">
+          <beforebreak>(?i)\bc\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)-à-d</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="German (DE) exceptions">
+        <!--Abbreviations-->
+        <rule break="no">
+          <beforebreak>(?i)\b(Adj|Adm|Adv|Asst|Bart|Bldg|Brig|Bros|Capt|Cmdr|Col|Comdr|Con|Corp|Cpl|DR|Dr|Ens|Fig|Gen|Gov|Hon|Hosp|Insp|Lt|MM|MR|MRS|MS|Maj|Messrs|Mlle|Mme|Mr|Mrs|Ms|Msgr|Op|Ord|Pfc|Ph|Prof|Pvt|Rep|Reps|Res|Rev|Rt|Sen|Sens|Sfc|Sgt|Sr|St|Supt|Surg|Mio|Mrd|bzw|v|vs|usw|etc|Mrd|MwSt|ggf|vgl|sogen|ff|Buchst|sog|Std|evtl|Zt|Chr|spp|sen|SA|jun|dgl|dergl|Co|zzt|usf|Dkr|Corp|bzgl|BSE|rel|inkl|geb|usw)\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+        <!--Compound abbreviations need another rule to avoid breaking inside them-->
+        <!--Abbreviation: z.Zt -->
+        <rule break="no">
+          <beforebreak>(?i)\bz\.\uE105\s*</beforebreak>
+          <afterbreak>(?i)Zt</afterbreak>
+        </rule>
+        <!--Abbreviations followed by numbers-->
+        <rule break="no">
+          <beforebreak>(?i)\b(No|Nos|Art|Nr|pp|ca|Ca|fig)\.\uE105?\s*</beforebreak>
+          <afterbreak>\d</afterbreak>
+        </rule>
+        <!--Ordinals are done with . in German - "1." = "1st" in English; don't break when dot is followed by these (leaving the afterbreak empty you avoid breaking after a digit and a dot)-->
+        <rule break="no">
+          <beforebreak>\d\.\uE105\s+</beforebreak>
+          <afterbreak>(?i)(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|Lebensjahr)(\.|\b)</afterbreak>
+        </rule>
+      </languagerule>
+
+
+      <languagerule languagerulename="Spanish (ES) exceptions">
+        <!--Abbreviations-->
+        <rule break="no">
+          <beforebreak>(?i)\b(Apdo|Av|Bco|Da|Dep|Dn|Dr|Dra|Excmo|Fil|Gral|Let|Lic|Prof|Pts|Rte|Sr|Sra|Srta|Sta|Sto|Ud|Uds|Vd|Vds|a/c|adj|admón|afmo|apdo|av|cap|cm|cta|dcha|doc|ej|entlo|esq|etc|grs|izq|nÃºm|núm|ptas|pÃ¡g|pÃ¡gs|pág|págs|vid|vol)\.\uE105\s*</beforebreak>
+          <afterbreak/>
+        </rule>
+      </languagerule>
+
+
+    </languagerules>
+    <!--Pay attention to the order of these mappings, exceptions should be on top to prevent breaks-->
+    <maprules>
+      <!--We exclude the languages we don't have confidence with-->
+      <languagemap languagepattern="(?i)^(?!af|hy|az|bn|zh|ka|gu|he|hi|km|ms|ml|mi|mm|nr|ne|ps|fa|qu|nso|tn|sw|tl|ta|te|th|ts|ur|vi|xh|zu).*" languagerulename="Single letter abbreviations exception"/>
+      <languagemap languagepattern="(?i)^(en|it|de|fr|es).*" languagerulename="Telephone numbers exceptions"/>
+      <languagemap languagepattern="(?i)^en.*" languagerulename="English (EN) exceptions"/>
+      <languagemap languagepattern="(?i)^it.*" languagerulename="Italian (IT) exceptions"/>
+      <languagemap languagepattern="(?i)^de.*" languagerulename="German (DE) exceptions"/>
+      <languagemap languagepattern="(?i)^fr.*" languagerulename="French (FR) exceptions"/>
+      <languagemap languagepattern="(?i)^es.*" languagerulename="Spanish (ES) exceptions"/>
+      <languagemap languagepattern=".*" languagerulename="Global"/>
+    </maprules>
+  </body>
+</srx>

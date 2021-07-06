@@ -8,13 +8,13 @@ if [ ! -d "/var/www/MateCat-Filters/" ]; then
     mvn clean install -DskipTests=true
 
     echo "build matecat filters layer"
-    git clone https://github.com/matecat/MateCat-Filters.git
+    git clone https://github.com/CrossLangNV/MateCat-Filters.git
     cd /var/www/okapi/MateCat-Filters/filters
     mvn clean package -DskipTests=true
 
     echo "Setting configurations"
     cd /var/www/okapi/MateCat-Filters/filters/target
-    cp ../src/main/resources/config.sample.properties config.properties
+    cp /tmp/config.properties config.properties
     mkdir -p /var/www/MateCat-Filters/
     cp -a /var/www/okapi/MateCat-Filters/filters/target/* /var/www/MateCat-Filters/
 
